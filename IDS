@@ -1,0 +1,25 @@
+import scapy.all as scapy
+from scapy.layers.inet import IP, TCP, UDP
+
+def detect_flood(packet):
+    # Check for heavy packet flood
+    if packet.haslayer(IP) and packet.haslayer(UDP):
+        if len(packet[UDP].payload) > 1000:
+            print("Heavy packet flood detected!")
+
+    # Check for light packet flood
+    if packet.haslayer(IP):
+        print("Light packet flood detected!")
+
+    # Check for SYN flood
+    if packet.haslayer(TCP) and packet[TCP].flags == "S":
+        print("SYN flood detected!")
+
+def sniff_packets(iface=None):
+    scapy.sniff(iface=iface, prn=detect_flood, store=0)
+
+if __name__ == "__main__":
+    try:
+        sniff_packets()
+    except KeyboardInterrupt:
+        print("Exiting...")
